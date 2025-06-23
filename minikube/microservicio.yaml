@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quarkus-camel
+  labels:
+    app: quarkus-camel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quarkus-camel
+  template:
+    metadata:
+      labels:
+        app: quarkus-camel
+    spec:
+      containers:
+        - name: quarkus-camel
+          image: carlos89/quarkus-camel:latest  # 🔁 Cambia esto por tu imagen
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms256m -Xmx512m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quarkus-camel
+spec:
+  type: NodePort
+  selector:
+    app: quarkus-camel
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30080  # 🔁 Puedes cambiar este puerto si lo deseas
