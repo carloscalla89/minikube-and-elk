@@ -1,0 +1,12 @@
+queryFrontend:
+  enabled: true
+
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3100
+      targetPort: 3100
+    - name: tempo-query
+      port: 3200
+      targetPort: 3200

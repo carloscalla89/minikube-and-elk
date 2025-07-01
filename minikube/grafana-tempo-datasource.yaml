@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-tempo-datasource
+  namespace: observability        # Cambia si tu namespace es otro
+  labels:
+    grafana_datasource: "1"
+data:
+  tempo-datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Tempo
+        type: tempo
+        access: proxy
+        orgId: 1
+        url: http://tempo:3100   # <-- Cambia esto si tu servicio Tempo está en otro nombre/puerto
+        isDefault: false
+        version: 1
+        editable: true
+        jsonData:
+          httpMethod: GET
+          serviceMap:
+            enabled: true
