@@ -1,30 +1,6 @@
-global:
-  storage:
-    trace:
-      backend: local
-
-ingester:
-  replicas: 1
-querier:
-  replicas: 1
-distributor:
-  replicas: 1
-compactor:
-  replicas: 1
 queryFrontend:
-  replicas: 1
+  streamOverHttpEnabled: true
+  httpListenPort: 3100
 
-serviceAccount:
-  create: true
-
-metricsGenerator:
-  enabled: false
-
-# Habilita el puerto HTTP para que Grafana pueda conectarse
-queryFrontend:
-  replicas: 1
-  service:
-    type: ClusterIP
-    http:
-      enabled: true
-      port: 3200
+server:
+  httpListenPort: 3100

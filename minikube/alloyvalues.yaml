@@ -1,0 +1,48 @@
+alloy:
+  configMap:
+    content: |-
+      // === Receptor OTLP ===
+      otelcol.receiver.otlp "default" {
+        // Habilita gRPC en el puerto 4317
+        grpc {
+          endpoint = "0.0.0.0:4317"
+        }
+        // Habilita HTTP en el puerto 4318
+        http {
+          endpoint = "0.0.0.0:4318"
+        }
+        output {
+          // Envía métricas y trazas al procesador batch
+          metrics = [otelcol.processor.batch.default.input]
+          traces  = [otelcol.processor.batch.default.input]
+        }
+      }
+
+      // === Procesador batch ===
+      otelcol.processor.batch "default" {
+        // Agrupa datos antes de exportarlos
+        timeout = "10s"
+        output {
+          // Envía al exporter OTLP
+          metrics = [otelcol.exporter.otlp.tempo.input]
+          traces  = [otelcol.exporter.otlp.tempo.input]
+        }
+      }
+
+      // === Exportador OTLP (gRPC) ===
+      otelcol.exporter.otlp "tempo" {
+        client {
+          // Endpoint dentro de tu cluster Minikube
+          endpoint = "http://tempo-distributed-distributor.monitoring.svc.cluster.local:4317"
+        }
+      }
+
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP

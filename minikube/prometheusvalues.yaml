@@ -1,0 +1,14 @@
+alertmanager:
+  enabled: false
+grafana:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    # Solo consume ServiceMonitors con label release=prometheus en el namespace alloy
+    serviceMonitorSelector:
+      matchLabels:
+        release: prometheus
+    serviceMonitorNamespaceSelector:
+      matchNames:
+        - alloy

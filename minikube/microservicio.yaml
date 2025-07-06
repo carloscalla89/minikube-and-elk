@@ -23,16 +23,13 @@ spec:
           env:
             - name: JAVA_OPTS
               value: "-Xms256m -Xmx512m"
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://tempo-distributed-distributor.observability.svc.cluster.local:9095"
-            - name: OTEL_EXPORTER_OTLP_PROTOCOL
-              value: "http/protobuf"  
-            - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.name=quarkus-camel"
-            - name: OTEL_TRACES_SAMPLER
-              value: "always_on"
-            - name: OTEL_SERVICE_NAME
-              value: "quarkus-camel"  
+            - name: QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT
+              #value: "http://tempo-distributed-distributor.monitoring.svc.cluster.local:4317"
+              value: "http://alloy.alloy.svc.cluster.local:4317"
+            #- name: QUARKUS_OTEL_EXPORTER_OTLP_PROTOCOL
+            #  value: "grpc"
+            - name: QUARKUS_OTEL_SERVICE_NAME
+              value: "quarkus-camel"
 ---
 apiVersion: v1
 kind: Service
