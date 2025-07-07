@@ -23,3 +23,6 @@ docker-compose restart logstash
 
 -- para construir la imagen del repositorio https://github.com/carloscalla89/quarkus-camel-rest
 docker build -f src/main/docker/Dockerfile -t carlos89/quarkus-camel .
+
+-- para ingresar al ELASTIC
+http://localhost:5601/app/home#/

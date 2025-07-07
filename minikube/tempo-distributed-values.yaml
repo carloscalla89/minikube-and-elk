@@ -1,6 +1,23 @@
-queryFrontend:
-  streamOverHttpEnabled: true
-  httpListenPort: 3100
-
 server:
-  httpListenPort: 3100
+  # Puerto interno para healthz (/ready) y métricas Prometheus
+  http_listen_port: 3200
+
+# (el resto de tu config, por ejemplo:)
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+  service:
+    ports:
+      - name: grpc
+        port: 9095
+        targetPort: grpc
+      - name: grpc-otlp
+        port: 4317
+        targetPort: 4317
+traces:
+  otlp:
+    grpc:
+      enabled: true        

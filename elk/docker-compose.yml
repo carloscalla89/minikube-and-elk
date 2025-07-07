@@ -34,6 +34,7 @@ services:
       - "5044:5044"    # Beats input
       - "5000:5000/tcp"  # TCP input
       - "5000:5000/udp"  # UDP input
+      - "5001:5001"  # UDP input
       - "9600:9600"    # Monitoring API
     environment:
       - xpack.monitoring.enabled=false

@@ -9,13 +9,6 @@ data:
   datasource.yaml: |-
     apiVersion: 1
     datasources:
-      - name: Prometheus
-        type: prometheus
-        access: proxy
-        url: http://prometheus-operated.monitoring.svc.cluster.local:9090
-        isDefault: true
-        version: 1
-
       - name: Tempo
         type: tempo
         access: proxy
