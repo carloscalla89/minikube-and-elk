@@ -41,47 +41,70 @@ alloy:
       }
 
       discovery.kubernetes "pods" {
+        
         role = "pod"
+
+        namespaces {
+          own_namespace = false
+
+          names = ["default"]
+        }
       }
 
-      // === (1) Captura de logs de Kubernetes ===
-      loki.source.kubernetes "pods" {
+      prometheus.scrape "demo" {
         targets    = discovery.kubernetes.pods.targets
-        forward_to = [otelcol.receiver.loki.k8s_converter.receiver]
+        forward_to = [prometheus.remote_write.demo.receiver]
       }
 
-      // 2) Convertir los logs de Loki a OTLP (LogsReceiver → Consumer)
-      otelcol.receiver.loki "k8s_converter" {
-        output {
-          logs = [otelcol.processor.batch.log_batch.input]
-        }
-      }
+      prometheus.remote_write "demo" {
+        endpoint {
+          url = "https://sfv56284.apps.dynatrace.com"
 
-      // 3) Batcher de logs
-      otelcol.processor.batch "log_batch" {
-        output {
-          logs = [otelcol.exporter.otlphttp.logstash_http.input]
-        }
-      }
-
-      // 4) Batcher de logs
-      otelcol.exporter.otlphttp "logstash_http" {
-        client {
-          endpoint = "http://host.minikube.internal:5001"
-          tls {
-            insecure = true
+          headers = {
+            "Authorization" = "bearer token",
           }
         }
-
-        // logs_endpoint = "/v1/logs"
-
-        sending_queue {
-          enabled           = true       // activa el búfer en memoria
-          queue_size        = 10000      // hasta 10 000 batches en cola
-          block_on_overflow = true       // espera en vez de retornar error
-          num_consumers     = 5          // envíos paralelos de batches
-        }
       }
+
+    
+      // === (1) Captura de logs de Kubernetes ===
+      //loki.source.kubernetes "pods" {
+      //  targets    = discovery.kubernetes.pods.targets
+      //  forward_to = [otelcol.receiver.loki.k8s_converter.receiver]
+      //}
+
+      // 2) Convertir los logs de Loki a OTLP (LogsReceiver → Consumer)
+      //otelcol.receiver.loki "k8s_converter" {
+      //  output {
+      //    logs = [otelcol.processor.batch.log_batch.input]
+      //  }
+      //}
+
+      // 3) Batcher de logs
+      //otelcol.processor.batch "log_batch" {
+      //  output {
+      //    logs = [otelcol.exporter.otlphttp.logstash_http.input]
+      //  }
+      //}
+
+      // 4) Batcher de logs
+      //otelcol.exporter.otlphttp "logstash_http" {
+      //  client {
+      //    endpoint = "http://host.minikube.internal:5001"
+      //    tls {
+      //      insecure = true
+      //    }
+      //  }
+
+  
+
+       //sending_queue {
+       //   enabled           = true       // activa el búfer en memoria
+       //   queue_size        = 10000      // hasta 10 000 batches en cola
+       //   block_on_overflow = true       // espera en vez de retornar error
+       //   num_consumers     = 5          // envíos paralelos de batches
+       // }
+      //}
 
   extraPorts:
     - name: otlp-grpc
@@ -92,3 +115,12 @@ alloy:
       port: 4318
       targetPort: 4318
       protocol: TCP
+
+prometheus:
+  prometheusSpec:
+    # Envía las métricas scrapeadas por Alloy a Dynatrace
+    remoteWrite:
+      - url: "https://sfv56284.apps.dynatrace.com/ui/api/v2/metrics/ingest"
+        bearerToken: "<token>"
+        tlsConfig:
+          insecureSkipVerify: false    
