@@ -1,0 +1,16 @@
+# 1. Desactivamos los componentes del Control Plane que dan error en Minikube
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeEtcd:
+  enabled: false
+
+# 2. Arreglamos el Kubelet (Fuente de datos de CPU/RAM para Grafana)
+kubelet:
+  enabled: true
+  serviceMonitor:
+    # Usamos HTTPS porque el puerto http (10255) suele estar cerrado en versiones nuevas
+    https: true
+    # CRUCIAL: Ignoramos que el certificado de Minikube sea autofirmado
+    insecureSkipVerify: true

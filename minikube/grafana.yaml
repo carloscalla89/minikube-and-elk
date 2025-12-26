@@ -1,7 +1,0 @@
-grafana:
-  enabled: true
-  adminUser: admin
-  adminPassword: SuperSecreto123   # Cámbialo por uno seguro
-  service:
-    type: NodePort                # O LoadBalancer/ClusterIP/Ingress
-    nodePort: 30030               # Solo para NodePort, opcional
