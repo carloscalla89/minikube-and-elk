@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: database
+---
+# 1. Secret para la contraseña
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${DATABASE}-postgres-secret
+  namespace: database
+type: Opaque
+stringData:
+  # En producción usa sealed-secrets o vault, para local esto está bien
+  postgres-password: ${DATABASE_PASS}
+---
+# 2. Persistencia (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${DATABASE}-postgres-pvc
+  namespace: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# 3. Deployment (La lógica)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${DATABASE}-postgres
+  namespace: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${DATABASE}-postgres
+  template:
+    metadata:
+      labels:
+        app: ${DATABASE}-postgres
+    spec:
+      containers:
+        - name: ${DATABASE}-postgres
+          image: postgres:15-alpine # Imagen oficial liviana
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: ${DATABASE}  # Nombre de tu BD inicial
+            - name: POSTGRES_USER
+              value: ${DATABASE_USER}          # Usuario
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ${DATABASE}-postgres-secret
+                  key: postgres-password
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: ${DATABASE}-postgres-storage
+      volumes:
+        - name: ${DATABASE}-postgres-storage
+          persistentVolumeClaim:
+            claimName: ${DATABASE}-postgres-pvc
+---
+# 4. Service (Exponer internamente)
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${DATABASE}-postgres-service
+  namespace: database
+spec:
+  selector:
+    app: ${DATABASE}-postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
