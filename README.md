@@ -5,7 +5,7 @@ minikube start --driver=docker
 minikube start --memory=10240 --cpus=4 --driver=docker
 
 
-# Para instalar postgres en minikube (Usar valores por defecto): Creará la BD dragonballdb con usuario user_db
+## Para instalar postgres en minikube: BD dragonballdb con usuario user_db
 ./postgres-dragonballdb-minikube-start.sh
 
 # Esto conecta el puerto 5432 de tu PC al 5432 del pod en Minikube. Para conectarse desde algun ide (ejemplo DBeaver):
